@@ -1,0 +1,3 @@
+mysqlclinet
+psycopg2
+pymongo

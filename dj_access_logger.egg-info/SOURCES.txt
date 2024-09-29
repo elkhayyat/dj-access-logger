@@ -1,0 +1,12 @@
+MANIFEST.in
+README.md
+setup.py
+dj_access_logger/__init__.py
+dj_access_logger/admin.py
+dj_access_logger/middleware.py
+dj_access_logger/models.py
+dj_access_logger.egg-info/PKG-INFO
+dj_access_logger.egg-info/SOURCES.txt
+dj_access_logger.egg-info/dependency_links.txt
+dj_access_logger.egg-info/requires.txt
+dj_access_logger.egg-info/top_level.txt
