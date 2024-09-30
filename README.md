@@ -35,24 +35,30 @@ MIDDLEWARE = [
     ...
 ]
 
-# Logging method: 'file', 'sql', or 'nosql'
-ACCESS_LOGGER_METHOD = 'file'
 
-# Database configuration for logging
-DJANGO_ACCESS_LOGGER_DATABASE = {
-    'ENGINE': 'django.db.backends.mysql',  # Use 'djongo' for MongoDB
-    'NAME': 'logging_db',
-    'USER': 'logging_user',
-    'PASSWORD': 'logging_password',
-    'HOST': 'localhost',
-    'PORT': '3306',
-    'NOSQL_HOST': 'mongodb://localhost:27017',  # NoSQL specific parameter
+# Logging method: 'file', 'sql', or 'nosql'
+DJ_ACCESS_LOGGER = {
+    'method': 'file',  # 'file' or 'sql' or 'nosql'
+    'separated_logging_db': True,
+    'obfuscate_secrets': True,
+    'logging_db_parameters': {
+        'ENGINE': 'django.db.backends.mysql',  # Use 'djongo' for MongoDB
+        'NAME': 'logging_db',
+        'USER': 'logging_user',
+        'PASSWORD': 'logging_password',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'NOSQL_HOST': 'mongodb://localhost:27017',  # NoSQL specific parameter
+    }
 }
 ```
 
 ## Usage
 
 The middleware will automatically log HTTP requests and responses based on the configuration.
+
+## Documentation
+For more detailed documentation, visit Read the Docs.
 
 ## License
 
