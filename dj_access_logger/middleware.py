@@ -1,68 +1,70 @@
-# django_access_logger/middleware.py
+# python
+import ipaddress
 
-import json
-import logging
-
-from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.timezone import now
 
-from .models import AccessLog
-
-logger = logging.getLogger(__name__)
+from dj_access_logger.repositories.repositories import RequestData, ResponseData, LogData
 
 
-class AccessLoggerMiddleware(MiddlewareMixin):
+class AccessLogMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        request._body = request.body
-        request._headers = request.headers
+        request.start_time = now()
 
     def process_response(self, request, response):
-        if getattr(settings, 'ACCESS_LOGGER_OBFUSCATE_SECRETS', True):
-            request_data = self._obfuscate_secrets(request._body)
-            response_data = self._obfuscate_secrets(response.content)
-        else:
-            request_data = request._body
-            response_data = response.content
+        request_body = request.body.decode('utf-8') if request.body else ''
 
-        log_data = {
-            'request': {
-                'headers': dict(request._headers),
-                'data': request_data.decode('utf-8') if request_data else '',
-                'method': request.method,
-            },
-            'response': {
-                'headers': dict(response.items()),
-                'data': response_data.decode('utf-8') if response_data else '',
-                'status_code': response.status_code,
-            }
-        }
+        request_data = RequestData(
+            url=request.build_absolute_uri(),
+            headers=dict(request.headers),
+            data=request_body,
+            method=request.method,
+            ip_address=self.get_client_ip(request)[0],
+            ipv4_address=self.get_client_ip(request)[1],
+            ipv6_address=self.get_client_ip(request)[2],
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            referer=request.META.get('HTTP_REFERER', ''),
+            session_data=dict(request.session.items()),
+            cookies=request.COOKIES,
+            query_params=request.GET,
+            request_path=request.path,
+            request_protocol=request.scheme,
+            request_encoding=request.encoding,
+            request_body_size=len(request_body)
+        )
 
-        if settings.ACCESS_LOGGER_METHOD == 'file':
-            logger.info(json.dumps(log_data, indent=2))
-        elif settings.ACCESS_LOGGER_METHOD == 'sql':
-            AccessLog.objects.create(
-                request_headers=log_data['request']['headers'],
-                request_data=log_data['request']['data'],
-                request_method=log_data['request']['method'],
-                response_headers=log_data['response']['headers'],
-                response_data=log_data['response']['data'],
-                response_status_code=log_data['response']['status_code']
-            )
-        elif settings.ACCESS_LOGGER_METHOD == 'nosql':
-            from pymongo import MongoClient
-            client = MongoClient(settings.DJANGO_ACCESS_LOGGER_DATABASE['NOSQL_HOST'])
-            db = client[settings.DJANGO_ACCESS_LOGGER_DATABASE['NAME']]
-            db.access_logs.insert_one(log_data)
+        response_data = ResponseData(
+            headers=dict(response.items()),
+            data=response.content.decode('utf-8') if response.content else '',
+            status_code=response.status_code,
+            response_time=(now() - request.start_time).total_seconds(),
+            response_body_size=len(response.content),
+        )
+
+        LogData(request=request_data, response=response_data).log()
 
         return response
 
-    def _obfuscate_secrets(self, data):
+    @staticmethod
+    def get_client_ip(request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+
+        ipv4_address = None
+        ipv6_address = None
+
         try:
-            data_dict = json.loads(data)
-            if 'password' in data_dict:
-                data_dict['password'] = '****'
-            if 'Authorization' in data_dict:
-                data_dict['Authorization'] = '****'
-            return json.dumps(data_dict).encode('utf-8')
-        except (ValueError, TypeError):
-            return data
+            ip_obj = ipaddress.ip_address(ip)
+            if ip_obj.version == 4:
+                ipv4_address = ip
+            elif ip_obj.version == 6:
+                ipv6_address = ip
+                if ip_obj.ipv4_mapped:
+                    ipv4_address = str(ip_obj.ipv4_mapped)
+        except ValueError:
+            pass
+
+        return ip, ipv4_address, ipv6_address

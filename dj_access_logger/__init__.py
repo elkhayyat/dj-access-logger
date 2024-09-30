@@ -1,0 +1,1 @@
+default_app_config = 'dj_access_logger.apps.DjAccessLoggerConfig'
