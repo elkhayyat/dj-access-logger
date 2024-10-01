@@ -58,7 +58,7 @@ DJ_ACCESS_LOGGER = {
 The middleware will automatically log HTTP requests and responses based on the configuration.
 
 ## Documentation
-For more detailed documentation, visit Read the Docs.
+For detailed documentation, visit [Read the Docs](https://dj-access-logger.readthedocs.io/en/latest/).
 
 ## License
 
