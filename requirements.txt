@@ -1,4 +1,3 @@
 mysqlclinet
 psycopg2
 pymongo
-sphinx-rtd-theme
