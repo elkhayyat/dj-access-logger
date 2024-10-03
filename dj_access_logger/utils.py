@@ -22,7 +22,9 @@ class AccessLoggerSetting:
             settings.DATABASE_ROUTERS = list(settings.DATABASE_ROUTERS)
         if not isinstance(settings.DATABASE_ROUTERS, list):
             settings.DATABASE_ROUTERS = []
-        settings.DATABASE_ROUTERS.append('dj_access_logger.db_router.LoggingDBRouter')
+
+        router_path = 'dj_access_logger.db_router.LoggingDBRouter'
+        settings.DATABASE_ROUTERS.append(router_path)
 
     def validate(self):
         if self.method not in ['file', 'sql', 'nosql']:

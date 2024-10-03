@@ -20,4 +20,3 @@ class DjAccessLoggerConfig(AppConfig):
                 if not os.path.exists(db_path):
                     print(f"Creating logging sqlite database at {db_path}")
                     open(db_path, 'w').close()
-                # call_command('migrate', app_label='dj_access_logger', database='logging')

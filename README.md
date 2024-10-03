@@ -8,6 +8,8 @@ Django Access Logger is a middleware for logging HTTP requests and responses in 
 - Log HTTP requests and responses
 - Support for file, SQL, and NoSQL logging
 - Configurable via Django settings
+- Compatible with django-tenants
+- Supports separate database for logging
 
 ## Installation
 
@@ -36,7 +38,7 @@ MIDDLEWARE = [
 ]
 
 
-# Logging method: 'file', 'sql', or 'nosql'
+# Logging configuration
 DJ_ACCESS_LOGGER = {
     'method': 'file',  # 'file' or 'sql' or 'nosql'
     'separated_logging_db': True,
@@ -51,6 +53,21 @@ DJ_ACCESS_LOGGER = {
         'NOSQL_HOST': 'mongodb://localhost:27017',  # NoSQL specific parameter
     }
 }
+
+
+# If using a separate logging database, add this to your DATABASE_ROUTERS
+DATABASE_ROUTERS = [
+    ...,
+    'dj_access_logger.db_router.LoggingDBRouter',
+    ...
+]
+```
+
+## Setup
+After changing your settings.py you need to run the following commands to create the necessary tables in the logging database:
+
+```sh
+python manage.py setup_dj_access_logger
 ```
 
 ## Usage

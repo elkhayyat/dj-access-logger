@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: dj-access-logger
-Version: 1.0.2
+Version: 1.0.3
 Summary: A Django middleware for logging HTTP requests and responses.
 Home-page: https://github.com/elkhayyat/dj-access-logger
 Author: AHMED ELKHAYYAT
