@@ -18,7 +18,7 @@ Add the middleware to your Django settings:
         ...
     ]
 
-    # Logging method: 'file', 'sql', or 'nosql'
+    # Logging configuration
     DJ_ACCESS_LOGGER = {
         'method': 'file',  # 'file' or 'sql' or 'nosql'
         'separated_logging_db': True,
@@ -33,3 +33,18 @@ Add the middleware to your Django settings:
             'NOSQL_HOST': 'mongodb://localhost:27017',  # NoSQL specific parameter
         }
     }
+
+
+    # If using a separate logging database, add this to your DATABASE_ROUTERS
+    DATABASE_ROUTERS = [
+        ...,
+        'dj_access_logger.db_router.LoggingDBRouter',
+        ...
+    ]
+
+Setup
+--------
+After changing your settings.py you need to run the following commands to create the necessary tables in the logging database:
+
+.. code-block:: bash
+    python manage.py setup_dj_access_logger
