@@ -18,6 +18,10 @@ class AccessLoggerSetting:
 
     def set_separated_logging_db(self):
         settings.DATABASES['logging'] = self.logging_db_parameters
+        if isinstance(settings.DATABASE_ROUTERS, tuple):
+            settings.DATABASE_ROUTERS = list(settings.DATABASE_ROUTERS)
+        if not isinstance(settings.DATABASE_ROUTERS, list):
+            settings.DATABASE_ROUTERS = []
         settings.DATABASE_ROUTERS.append('dj_access_logger.db_router.LoggingDBRouter')
 
     def validate(self):
