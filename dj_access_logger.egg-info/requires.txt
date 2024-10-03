@@ -3,3 +3,4 @@ pymongo
 djongo
 mysqlclient
 psycopg2
+pygments
