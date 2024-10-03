@@ -1,3 +1,4 @@
 mysqlclinet
 psycopg2
 pymongo
+pygments
