@@ -10,9 +10,11 @@ from dj_access_logger.repositories.repositories import RequestData, ResponseData
 class AccessLogMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.start_time = now()
+        # Read and store the request body to avoid multiple reads
+        request._body = request.body if request.body else b''
 
     def process_response(self, request, response):
-        request_body = request.body.decode('utf-8') if request.body else ''
+        request_body = request._body.decode('utf-8') if request._body else ''
 
         request_data = RequestData(
             url=request.build_absolute_uri(),
