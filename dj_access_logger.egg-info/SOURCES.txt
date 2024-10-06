@@ -21,8 +21,13 @@ dj_access_logger/loggers/file_logger.py
 dj_access_logger/loggers/nosql_logger.py
 dj_access_logger/loggers/singleton.py
 dj_access_logger/loggers/sql_logger.py
+dj_access_logger/management/__init__.py
+dj_access_logger/management/commands/__init__.py
+dj_access_logger/management/commands/setup_dj_access_logger.py
 dj_access_logger/migrations/0001_initial.py
 dj_access_logger/migrations/0002_accesslog_ipv4_address_accesslog_ipv6_address.py
 dj_access_logger/migrations/__init__.py
 dj_access_logger/repositories/__init__.py
 dj_access_logger/repositories/repositories.py
+dj_access_logger/tests/__init__.py
+dj_access_logger/tests/test_middleware.py
