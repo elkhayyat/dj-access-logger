@@ -3,6 +3,7 @@ import ipaddress
 
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.timezone import now
+from django.http import FileResponse
 
 from dj_access_logger.repositories.repositories import RequestData, ResponseData, LogData
 
@@ -18,6 +19,11 @@ class AccessLogMiddleware(MiddlewareMixin):
             request_body = request._body.decode('utf-8') if request._body else ''
         except UnicodeDecodeError:
             request_body = "<Binary Data>"
+
+        if isinstance(response, FileResponse):
+            response_data_content = "<File Response>"
+        else:
+            response_data_content = response.content.decode('utf-8') if response.content else ''
 
         request_data = RequestData(
             url=request.build_absolute_uri(),
@@ -40,10 +46,10 @@ class AccessLogMiddleware(MiddlewareMixin):
 
         response_data = ResponseData(
             headers=dict(response.items()),
-            data=response.content.decode('utf-8') if response.content else '',
+            data=response_data_content,
             status_code=response.status_code,
             response_time=(now() - request.start_time).total_seconds(),
-            response_body_size=len(response.content),
+            response_body_size=len(response_data_content),
         )
 
         LogData(request=request_data, response=response_data).log()
