@@ -14,7 +14,10 @@ class AccessLogMiddleware(MiddlewareMixin):
         request._body = request.body if request.body else b''
 
     def process_response(self, request, response):
-        request_body = request._body.decode('utf-8') if request._body else ''
+        try:
+            request_body = request._body.decode('utf-8') if request._body else ''
+        except UnicodeDecodeError:
+            request_body = "<Binary Data>"
 
         request_data = RequestData(
             url=request.build_absolute_uri(),
